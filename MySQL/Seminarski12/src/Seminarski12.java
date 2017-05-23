@@ -1,18 +1,11 @@
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.awt.event.*;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.*;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -28,7 +21,8 @@ public class Seminarski12 extends JPanel implements ActionListener{
 	
 	private List<JTextField> textFields= new ArrayList<JTextField>(); 
 	private UtilDateModel dateModel;
-	
+	private boolean postavljeno = false;
+
 	private static SessionFactory factory; 
 	public static void main(String[] args) {
 		try{
@@ -114,6 +108,19 @@ public class Seminarski12 extends JPanel implements ActionListener{
         addAButton("Insert", this);
         addAButton("Report", this);
         addAButton("Exit", this);
+
+        JCheckBox sortButton = new JCheckBox("Sort by points");
+        sortButton.setMnemonic(KeyEvent.VK_T);
+        sortButton.setSelected(false);
+        sortButton.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.DESELECTED)
+                    postavljeno = false;
+                else postavljeno = true;
+            }
+        });
+        add(sortButton);
     }
  
     private void createFieldWithLabel(String labeltext, Container container){
@@ -204,14 +211,90 @@ public class Seminarski12 extends JPanel implements ActionListener{
 				System.out.println("Nagrada mora da iznosi izmedju 0 i 60 bodova");
 				return;
 			}
-			
+
+
 			Short s = insertPrijavljeni(prijavljeni);
 			System.out.println(s);
+			if(s != null){
+                Prijavljeni uspesnoPrijavljeni = selectPrijavljeni(s);
+                JDialog dialog = new JDialog();
+                Box dialogBox = Box.createVerticalBox();
+                dialogBox.add(new JLabel("Rbr " + uspesnoPrijavljeni.getRbr()));
+                dialogBox.add(new JLabel("Ime " + uspesnoPrijavljeni.getIme()));
+                dialogBox.add(new JLabel("Prezime " + uspesnoPrijavljeni.getPrezime()));
+                dialogBox.add(new JLabel("Uspesno prijavljeni!"));
+                dialog.add(dialogBox);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
 		}
-			
-		
+		else if(e.getActionCommand().equals("Clear")){
+		    for(JTextField tf : textFields){
+		        tf.setText("");
+            }
+            dateModel.setValue(new Date());
+        }
+        else if(e.getActionCommand().equals("Exit")){
+		    System.exit(0);
+        }
+        else if(e.getActionCommand().equals("Report")){
+            List<Prijavljeni> sviPrijavljeni = selectPrijavljeni();
+            System.out.println(sviPrijavljeni.size());
+            List<Reportable> reportables = new ArrayList<>();
+            for(Prijavljeni p : sviPrijavljeni){
+                reportables.add((Reportable)p);
+            }
+            try {
+                OutputStreamWriter streamWriter = new OutputStreamWriter(new FileOutputStream("izvestaj.txt"));
+                ReportPrinter printer = new ReportPrinter(streamWriter);
+                printer.printList(reportables);
+                streamWriter.close();
+            }
+            catch (Exception exc){
+                System.out.println("jbg");
+            }
+        }
 	}
-	
+
+	private List<Prijavljeni> selectPrijavljeni(){
+        Session session = factory.openSession();
+        Transaction tx = null;
+        List<Prijavljeni> prijavljeni = new ArrayList<>();
+        try{
+            tx = session.beginTransaction();
+            String query = "FROM Prijavljeni" + ((postavljeno)? " order by ukupno desc" : " order by rbr");
+            List prijavljeniFromDB = session.createQuery(query).list();
+            for (Iterator iterator = prijavljeniFromDB.iterator(); iterator.hasNext();){
+                Prijavljeni ptmp = (Prijavljeni) iterator.next();
+                prijavljeni.add(ptmp);
+            }
+            tx.commit();
+        }catch (HibernateException e) {
+            if (tx!=null) tx.rollback();
+            e.printStackTrace();
+        }finally {
+            session.close();
+        }
+        return prijavljeni;
+    }
+
+    private Prijavljeni selectPrijavljeni(Short rbr){
+        Session session = factory.openSession();
+        Transaction tx = null;
+        Prijavljeni prijavljeniFromDB = null;
+        try{
+            tx = session.beginTransaction();
+            prijavljeniFromDB = (Prijavljeni)session.get(Prijavljeni.class, rbr);
+            tx.commit();
+        }catch (HibernateException e) {
+            if (tx!=null) tx.rollback();
+            e.printStackTrace();
+        }finally {
+            session.close();
+        }
+        return prijavljeniFromDB;
+    }
+
 	private Short insertPrijavljeni(Prijavljeni prijavljeni){
 		Session session = factory.openSession();
 		Transaction tx = null;

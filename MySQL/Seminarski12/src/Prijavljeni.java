@@ -1,7 +1,9 @@
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 
 
-public class Prijavljeni {
+public class Prijavljeni implements Reportable {
 	private short rbr;
 	private String ime;
 	private String prezime;
@@ -263,4 +265,52 @@ public class Prijavljeni {
 	public void racunajUkupno(){
 		ukupno = 2*(prosek1+prosek2+prosek3+prosek4) + prijemni;
 	}
+
+	@Override
+	public void report(OutputStreamWriter outputStream) {
+        try {
+            outputStream.write("  {\n");
+            outputStream.write("    rbr: " + rbr + ",\n");
+            outputStream.write("    ime: " + ime + ",\n");
+            outputStream.write("    prezime: " + prezime + ",\n");
+            outputStream.write("    roditelj: " + roditelj + ",\n");
+            outputStream.write("    jmbg: " + jmbg + ",\n");
+            outputStream.write("    datum_rodjenja: " + datum_rodjenja + ",\n");
+            outputStream.write("    mesto_stanovanja: " + mesto_stanovanja + ",\n");
+            outputStream.write("    adresa: " + adresa + ",\n");
+            outputStream.write("    id_smer_1: " + id_smer1 + ",\n");
+            outputStream.write("    id_smer_2: " + id_smer2 + ",\n");
+            outputStream.write("    id_smer_3: " + id_smer3 + ",\n");
+            outputStream.write("    prosek_I_god: " + prosek1 + ",\n");
+            outputStream.write("    prosek_II_god: " + prosek2 + ",\n");
+            outputStream.write("    prosek_III_god: " + prosek3 + ",\n");
+            outputStream.write("    prosek_IV_god: " + prosek4 + ",\n");
+            outputStream.write("    nagrada: " + nagrada + ",\n");
+            outputStream.write("    prijemni: " + prijemni + ",\n");
+            outputStream.write("    ukupno: " + ukupno + " ");
+            outputStream.write("\n");
+            outputStream.write("  },\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	//rbr 8 mesta
+	@Override
+	public void printHeader(OutputStreamWriter outputStream) {
+        try {
+            outputStream.write("[");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void printFooter(OutputStreamWriter outputStreamWriter){
+        try {
+            outputStreamWriter.write("]");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
