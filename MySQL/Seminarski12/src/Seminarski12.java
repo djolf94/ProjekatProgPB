@@ -180,39 +180,62 @@ public class Seminarski12 extends JPanel implements ActionListener{
 			prijavljeni.setNagrada(Short.parseShort(textFields.get(13).getText().trim()));
 			}
 			catch (NumberFormatException pera) {
-				System.out.println("U nekom od polja za numericke vrednosti je neispravan unos");
+				showErrorAlert("U nekom od polja za numericke vrednosti je neispravan unos", "Greska pri unosu");
 				return;
 			}
 			
 			prijavljeni.racunajUkupno();
-			
+
+			if(prijavljeni.getIme().isEmpty()){
+			    showErrorAlert("Polje za ime ne sme biti prazno", "Greska pri unosu");
+                return;
+			}
+
+            if(prijavljeni.getPrezime().isEmpty()){
+                showErrorAlert("Polje za prezime ne sme biti prazno", "Greska pri unosu");
+                return;
+			}
+
+            if(prijavljeni.getRoditelj().isEmpty()){
+                showErrorAlert("Polje za roditelja ne sme biti prazno", "Greska pri unosu");
+                return;
+            }
+
+            if(prijavljeni.getAdresa().isEmpty()){
+                showErrorAlert("Polje za adresu ne sme biti prazno", "Greska pri unosu");
+            }
+
+            if(prijavljeni.getMesto_stanovanja().isEmpty()){
+                showErrorAlert("Polje za messto stanovanja ne sme biti prazno", "Greska pri unosu");
+            }
+
 			if (prijavljeni.getProsek1() <2 || prijavljeni.getProsek1() > 5) {
-				System.out.println("Prosek za 1 godine nije u redu");
+				showErrorAlert("Prosek za prvu godinu nije u redu", "Greska pri unosu");
 				return;
 			}
 			if (prijavljeni.getProsek2() <2 || prijavljeni.getProsek2() > 5) {
-				System.out.println("Prosek za 2 godine nije u redu");
+				showErrorAlert("Prosek za drugu godinu nije u redu", "Greska pri unosu");
 				return;
 			}
 			if (prijavljeni.getProsek3()<2 || prijavljeni.getProsek3() > 5) {
-				System.out.println("Prosek za 3 godine nije u redu");
+				showErrorAlert("Prosek za trecu godinu nije u redu", "Greska pri unosu");
 				return;
 			}
 			if (prijavljeni.getProsek4() <2 || prijavljeni.getProsek4() > 5) {
-				System.out.println("Prosek za 4 godine nije u redu");
+				showErrorAlert("Prosek za cetvrtu godinu nije u redu", "Greska pri unosu");
 				return;
 			}
 			
 			if (prijavljeni.getJmbg().length() != 13) {
-				System.out.println("JMBG neispravne duzine");
+				showErrorAlert("JMBG neispravne duzine", "Greska pri unosu");
 				return;
 			}
 			if (!prijavljeni.getJmbg().matches("[0-9]+")) {
-				System.out.println("JMBG ne sadzri samo numericke vrednosti");
+				showErrorAlert("JMBG neispravnog formata", "Greska pri unosu");
 				return;
 			}
 			if (prijavljeni.getNagrada() <1 || prijavljeni.getNagrada() > 60) {
-				System.out.println("Nagrada mora da iznosi izmedju 0 i 60 bodova");
+				showErrorAlert("Nagrada mora da iznosi izmedju 0 i 60 bodova", "Greska pri unosu");
 				return;
 			}
 
@@ -294,6 +317,13 @@ public class Seminarski12 extends JPanel implements ActionListener{
             session.close();
         }
         return prijavljeniFromDB;
+    }
+
+    private void showErrorAlert(String error, String windowName){
+        JOptionPane.showMessageDialog(this,
+                error,
+                windowName,
+                JOptionPane.ERROR_MESSAGE);
     }
 
     private void showErrorAlert(HibernateException error){
