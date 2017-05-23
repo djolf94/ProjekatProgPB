@@ -66,7 +66,7 @@ public class Seminarski12 extends JPanel implements ActionListener{
         p.put("text.month", "Month");
         p.put("text.year", "Year");
         
-        dateModel = new UtilDateModel();
+        dateModel = new UtilDateModel(new Date());
         JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, p);
         JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
          
@@ -103,10 +103,14 @@ public class Seminarski12 extends JPanel implements ActionListener{
         box = Box.createHorizontalBox();
         createFieldWithLabel("Nagrada", box);
         add(box); 
-        
-        addAButton("Clear", this);
-        addAButton("Insert", this);
-        addAButton("Report", this);
+
+        box = Box.createHorizontalBox();
+        addAButton("Clear", box);
+        addAButton("Insert", box);
+        add(box);
+        box = Box.createHorizontalBox();
+        addAButton("Report", box);
+        add(box);
         addAButton("Exit", this);
 
         JCheckBox sortButton = new JCheckBox("Sort by points");
@@ -120,7 +124,7 @@ public class Seminarski12 extends JPanel implements ActionListener{
                 else postavljeno = true;
             }
         });
-        add(sortButton);
+        box.add(sortButton);
     }
  
     private void createFieldWithLabel(String labeltext, Container container){
@@ -212,20 +216,15 @@ public class Seminarski12 extends JPanel implements ActionListener{
 				return;
 			}
 
-
 			Short s = insertPrijavljeni(prijavljeni);
 			System.out.println(s);
 			if(s != null){
                 Prijavljeni uspesnoPrijavljeni = selectPrijavljeni(s);
-                JDialog dialog = new JDialog();
-                Box dialogBox = Box.createVerticalBox();
-                dialogBox.add(new JLabel("Rbr " + uspesnoPrijavljeni.getRbr()));
-                dialogBox.add(new JLabel("Ime " + uspesnoPrijavljeni.getIme()));
-                dialogBox.add(new JLabel("Prezime " + uspesnoPrijavljeni.getPrezime()));
-                dialogBox.add(new JLabel("Uspesno prijavljeni!"));
-                dialog.add(dialogBox);
-                dialog.pack();
-                dialog.setVisible(true);
+                JOptionPane.showMessageDialog(this,
+                        "Rbr " + uspesnoPrijavljeni.getRbr() + "\n" + "Ime " + uspesnoPrijavljeni.getIme() + "\n"
+                        + "Prezime " + uspesnoPrijavljeni.getPrezime(),
+                        "Uspesno prijavljen!",
+                        JOptionPane.PLAIN_MESSAGE);
             }
 		}
 		else if(e.getActionCommand().equals("Clear")){
@@ -272,6 +271,7 @@ public class Seminarski12 extends JPanel implements ActionListener{
         }catch (HibernateException e) {
             if (tx!=null) tx.rollback();
             e.printStackTrace();
+            showErrorAlert(e);
         }finally {
             session.close();
         }
@@ -289,11 +289,21 @@ public class Seminarski12 extends JPanel implements ActionListener{
         }catch (HibernateException e) {
             if (tx!=null) tx.rollback();
             e.printStackTrace();
+            showErrorAlert(e);
         }finally {
             session.close();
         }
         return prijavljeniFromDB;
     }
+
+    private void showErrorAlert(HibernateException error){
+        Throwable thr = error.getCause();
+        JOptionPane.showMessageDialog(this,
+                thr.toString(),
+                "SQL error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
 
 	private Short insertPrijavljeni(Prijavljeni prijavljeni){
 		Session session = factory.openSession();
@@ -305,7 +315,8 @@ public class Seminarski12 extends JPanel implements ActionListener{
 	         tx.commit();
 	      }catch (HibernateException e) {
 	         if (tx!=null) tx.rollback();
-	         e.printStackTrace(); 
+	         e.printStackTrace();
+              showErrorAlert(e);
 	      }finally {
 	         session.close(); 
 	      }
