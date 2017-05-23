@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"> 
+
+<hibernate-mapping>
+   <class name="Prijavljeni" table="prijavljeni">
+      <meta attribute="class-description">
+         This class contains the employee detail. 
+      </meta>
+      <id name="rbr">
+         <generator class="native"/>
+      </id>
+      <property name="ime"/>
+      <property name="prezime"/>
+      <property name="roditelj"/>
+      <property name="jmbg"/>
+      <property name="datum_rodjenja"/>
+      <property name="mesto_stanovanja"/>
+      <property name="adresa"/>
+      <property name="id_smer1" column="id_smer_1"/>
+      <property name="id_smer2" column="id_smer_2"/>
+      <property name="id_smer3" column="id_smer_3"/>
+      <property name="prosek1" column="prosek_I_god"/>
+      <property name="prosek2" column="prosek_II_god"/>
+      <property name="prosek3" column="prosek_III_god"/>
+      <property name="prosek4" column="prosek_IV_god"/>
+      <property name="nagrada"/>
+      <property name="prijemni"/>
+      <property name="ukupno"/>
+   </class>
+</hibernate-mapping>

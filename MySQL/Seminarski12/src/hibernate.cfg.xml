@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+   <session-factory>
+      <!-- db2
+         <property name="hibernate.dialect">
+         org.hibernate.dialect.DB2Dialect
+      </property>
+
+      <property name="hibernate.connection.driver_class">
+         com.ibm.db2.jcc.DB2Driver
+      </property>
+
+   <property name="hibernate.connection.url">
+      jdbc:db2://localhost:50001/VSTUD
+   </property>
+
+   <property name="hibernate.connection.username">
+      student
+   </property>
+   <property name="hibernate.connection.password">
+      abcdef
+   </property>
+-->
+
+       <property name="hibernate.dialect">
+           org.hibernate.dialect.DB2Dialect
+       </property>
+
+       <property name="hibernate.connection.driver_class">
+           com.mysql.jdbc.Driver
+       </property>
+
+       <property name="hibernate.connection.url">
+           jdbc:mysql://localhost:3306/mydb
+       </property>
+
+       <property name="hibernate.connection.username">
+           student
+       </property>
+       <property name="hibernate.connection.password">
+           abcdef
+       </property>
+
+       <!-- List of XML mapping files -->
+   <mapping resource="Prijavljeni.hbm.xml"/>
+
+</session-factory>
+</hibernate-configuration>
